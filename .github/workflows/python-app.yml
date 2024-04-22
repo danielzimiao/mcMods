@@ -26,6 +26,11 @@ jobs:
       run: |
         pyinstaller --add-data 'mods/*:mods' --onefile installer.py
 
+    - name: Get Date and Time
+      id: date
+      run: |
+        echo "RELEASE_TIME=$(date +'%Y.%m.%d.%H%M')" >> $GITHUB_ENV
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -33,7 +38,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: Beta Ver 0.${{ github.event.push.timestamp.split('-')[0] }}.${{ github.event.push.timestamp.split('-')[1] }}.${{ github.event.push.timestamp.split('-')[2].substring(0,2) }}.${{ github.event.push.timestamp.split('T')[1].substring(0,2) }}${{ github.event.push.timestamp.split('T')[1].substring(3,5) }}
+        release_name: Beta Ver 0.$RELEASE_TIME
         draft: false
         prerelease: false
 
