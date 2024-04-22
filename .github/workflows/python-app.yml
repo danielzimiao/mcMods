@@ -1,4 +1,4 @@
-name: Python application
+name: Build
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
 
     - name: Build executable
       run: |
-        pyinstaller --add-data 'mods/*:mods' --onefile installer.py
+        pyinstaller --add-data 'mods/*:mods' installer.py
 
     - name: Get Date and Time
       id: date
@@ -32,31 +32,15 @@ jobs:
         echo "RELEASE_TIME=$(Get-Date -Format 'MM.dd.HHmm')" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       shell: pwsh
 
-    - name: Download and install signtool
-      run: |
-        Invoke-WebRequest -Uri "https://aka.ms/signtool" -OutFile signtool.zip
-        Expand-Archive signtool.zip -DestinationPath $env:RUNNER_TEMP
-        echo "$env:RUNNER_TEMP/signtool" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      shell: pwsh
-
-    - name: Sign Executable
-      run: |
-        $pfxBase64 = "${{ secrets.CODESIGN_CERT }}"
-        $pfxPassword = "${{ secrets.CODESIGN_PASSWORD }}"
-        $pfxPath = "$env:RUNNER_TEMP/mycert.pfx"
-        $pfxBytes = [Convert]::FromBase64String($pfxBase64)
-        [IO.File]::WriteAllBytes($pfxPath, $pfxBytes)
-        signtool sign /f $pfxPath /p $pfxPassword /t http://timestamp.digicert.com /v dist/installer.exe
-      shell: pwsh
-
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE_TIME: ${{ env.RELEASE_TIME }}
       with:
         tag_name: release-${{ github.sha }}
-        release_name: Beta Ver 0.${{ env.RELEASE_TIME }}.SN
+        release_name: Beta Ver 0.${{ env.RELEASE_TIME }}.O
         draft: false
         prerelease: false
 
@@ -73,4 +57,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: dist/installer.exe
-        asset_name: ModInstaller.exe
+        asset_name: installer.exe
+        asset_content_type: application/octet-stream
