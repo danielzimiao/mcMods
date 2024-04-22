@@ -24,7 +24,7 @@ jobs:
 
     - name: Build executable
       run: |
-        pyinstaller --add-data 'mods/*:mods' installer.py
+        pyinstaller --add-data 'mods/*:mods' --onedir installer.py
 
     - name: Get Date and Time
       id: date
