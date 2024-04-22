@@ -55,6 +55,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: build/exe.win-amd64-3.x/installer/installer.exe
+        asset_path: build/exe.win-amd64-3.12/installer/installer.exe
         asset_name: installer.exe
         asset_content_type: application/octet-stream
