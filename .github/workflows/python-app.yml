@@ -4,12 +4,9 @@ on:
   push:
     branches: [ main ]
 
-permissions:
-  contents: write
-  issues: write
-
 jobs:
   build:
+
     runs-on: windows-latest
 
     steps:
@@ -32,16 +29,18 @@ jobs:
     - name: Get Date and Time
       id: date
       run: |
-        echo "RELEASE_TIME=$(date +'%Y.%m.%d.%H%M')" >> $GITHUB_ENV
+        echo "RELEASE_TIME=$(Get-Date -Format 'yyyy.MM.dd.HHmm')" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      shell: pwsh
 
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE_TIME: ${{ env.RELEASE_TIME }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: Beta Ver 0.$RELEASE_TIME
+        release_name: Beta Ver 0.${{ env.RELEASE_TIME }}
         draft: false
         prerelease: false
 
@@ -57,6 +56,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/installer.exe
+        asset_path: dist/installer.exe
         asset_name: installer.exe
         asset_content_type: application/octet-stream
