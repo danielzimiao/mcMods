@@ -29,7 +29,7 @@ jobs:
     - name: Get Date and Time
       id: date
       run: |
-        echo "RELEASE_TIME=$(Get-Date -Format 'yyyy.MM.dd.HHmm')" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+        echo "RELEASE_TIME=$(Get-Date -Format 'MM.dd.HHmm')" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       shell: pwsh
 
     - name: Create Release
