@@ -39,7 +39,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         RELEASE_TIME: ${{ env.RELEASE_TIME }}
       with:
-        tag_name: ${{ github.ref }}
+        tag_name: ${{ github.sha }}
         release_name: Beta Ver 0.${{ env.RELEASE_TIME }}
         draft: false
         prerelease: false
