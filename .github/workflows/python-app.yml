@@ -1,8 +1,8 @@
-name: Build
+name: Python application
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 jobs:
   build:
@@ -20,11 +20,11 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pyinstaller
+        pip install cx_Freeze
 
     - name: Build executable
       run: |
-        pyinstaller --add-data 'mods/*:mods' --onedir installer.py
+        python setup.py build
 
     - name: Get Date and Time
       id: date
@@ -37,10 +37,9 @@ jobs:
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        RELEASE_TIME: ${{ env.RELEASE_TIME }}
       with:
         tag_name: release-${{ github.sha }}
-        release_name: Beta Ver 0.${{ env.RELEASE_TIME }}.O
+        release_name: Beta Ver 0.${{ env.RELEASE_TIME }}.cx
         draft: false
         prerelease: false
 
@@ -48,7 +47,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: installer
-        path: dist/installer.exe
+        path: build/exe.win-amd64-3.x/installer
 
     - name: Upload Executable to Release
       uses: actions/upload-release-asset@v1
@@ -56,6 +55,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: dist/installer/installer.exe
-        asset_name: installer.exe
+        asset_path: build/exe.win-amd64-3.x/installer
+        asset_name: installer
         asset_content_type: application/octet-stream
