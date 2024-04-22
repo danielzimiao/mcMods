@@ -26,8 +26,29 @@ jobs:
       run: |
         pyinstaller --add-data 'mods/*:mods' --onefile installer.py
 
-    - name: Upload executable
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Beta Ver 0.${{ github.event.push.timestamp.split('-')[0] }}.${{ github.event.push.timestamp.split('-')[1] }}.${{ github.event.push.timestamp.split('-')[2].substring(0,2) }}.${{ github.event.push.timestamp.split('T')[1].substring(0,2) }}${{ github.event.push.timestamp.split('T')[1].substring(3,5) }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Executable to Artifacts
       uses: actions/upload-artifact@v2
       with:
         name: installer
         path: dist/installer.exe
+
+    - name: Upload Executable to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/installer.exe
+        asset_name: installer.exe
+        asset_content_type: application/octet-stream
